@@ -1,6 +1,8 @@
-import {test,Locator,expect} from "@playwright/test";
+import {test, Locator, expect, Page} from "@playwright/test";
+
 
 const URL='https://todo-app.tallinn-learning.ee/'
+let page: Page;
 
 test('test a task', async ({page}) => {
     await page.goto(URL)
