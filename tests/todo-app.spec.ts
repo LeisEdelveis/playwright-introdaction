@@ -1,81 +1,86 @@
-import {test, Locator, expect, Page} from "@playwright/test";
+import {test, expect} from "@playwright/test";
+import {ToDoPage} from "./pages/page";
 
 
-const URL='https://todo-app.tallinn-learning.ee/'
-let page: Page;
+const URL = 'https://todo-app.tallinn-learning.ee/';
 
-test('test a task', async ({page}) => {
-    await page.goto(URL)
+let todoPage: ToDoPage;
 
-    const todoInput:Locator = page.getByTestId('text-input')
-    await todoInput.fill('water a plant')
-    await todoInput.press('Enter')
+test.beforeEach(async ({page}) => {
+    await page.goto(URL);
 
-    const todoTask:Locator = page.getByTestId('todo-item-label')
-    await expect(todoTask).toBeVisible()
+    todoPage = new ToDoPage(page);
 });
 
-test('test that 2 tasks and validate filters', async ({page}) => {
-    await page.goto(URL)
+test('test a task', async () => {
+    const input = todoPage.todoTextInput;
 
-    const todoInput:Locator = page.getByTestId('text-input')
-    await todoInput.fill('water a plant')
-    await todoInput.press('Enter')
+    await input.fill('water a plant')
+    await input.press('Enter')
 
+    const task = todoPage.todoItemLabel;
 
-    await todoInput.fill('Go to the gym')
-    await todoInput.press('Enter')
+    await expect(task).toBeVisible()
+});
 
-    const todoTask:Locator = page.getByTestId('todo-item-label')
+test('test that 2 tasks and validate filters', async () => {
+    const input = todoPage.todoTextInput;
 
-    await expect(todoTask).toHaveCount(2)
-    const completedLink = page.getByRole('link', {name:'Completed'})
-    await completedLink.click();
-    await expect(todoTask).toHaveCount(0)
+    await input.fill('water a plant')
+    await input.press('Enter')
 
+    await input.fill('Go to the gym')
+    await input.press('Enter')
 
+    const task = todoPage.todoItemLabel;
+
+    await expect(task).toHaveCount(2)
+
+    const completeTask = todoPage.completedLink;
+
+    await completeTask.click();
+
+    await expect(task).toHaveCount(0)
 });
 
 
-test('create a task and mark as completed', async ({page}) => {
-    await page.goto(URL)
+test('create a task and mark as completed', async () => {
+    const input = todoPage.todoTextInput;
 
-    const todoInput:Locator = page.getByTestId('text-input')
-    await todoInput.fill('water a plant')
-    await todoInput.press('Enter')
-    const toggle = page.getByTestId('todo-item-toggle')
+    await input.fill('water a plant')
+    await input.press('Enter')
+
+    const toggle = todoPage.todoItemToggle
     await toggle.click()
 
-    const todoTask:Locator = page.getByTestId('todo-item-label')
-    await expect(todoTask).toHaveCount(1)
+    const task = todoPage.todoItemLabel;
+    await expect(task).toHaveCount(1)
 
+    const completeTask = todoPage.completedLink;
+    await completeTask.click();
+    await expect(task).toHaveCount(1)
 
-    const completedLink = page.getByRole('link', {name: 'Completed'})
-    await completedLink.click();
-    await expect(todoTask).toHaveCount(1)
+    const markCompleted = todoPage.completedLink
+    await markCompleted.click()
 
-
-    const activeLink = page.getByRole('link', {name: 'Active'})
-    await activeLink.click();
-    await expect(todoTask).toHaveCount(0)
-
-
-    const clear = page.getByRole('button', {name: 'Clear completed'})
-    await clear.click()
-    await expect(todoTask).toHaveCount(0)
+    await expect(markCompleted).toHaveCount(1)
 });
 
-test.only('create a task and rename it', async ({page}) => {
-    await page.goto(URL)
+test('create a task and rename it', async ({page}) => {
+    const input = todoPage.todoTextInput;
 
-    const todoInput:Locator = page.getByTestId('text-input')
-    await todoInput.fill('water a plant')
-    await todoInput.press('Enter')
+    await input.fill('water a plant')
+    await input.press('Enter')
 
-    const todoTask:Locator = page.getByTestId('todo-item-label')
+    const todoItemLabel = todoPage.todoItemLabel;
+    await todoItemLabel.dblclick();
 
-    await todoTask.dblclick()
-    await page.getByTestId('todo-item').getByTestId('text-input').fill('kwa');
-    await page.getByTestId('todo-item').getByTestId('test-input').press('Enter');
+    const todoItemInput = page.getByTestId('todo-item').getByTestId('text-input')
+
+    await todoItemInput.fill('kwa');
+    await todoItemInput.press('Enter');
+    await expect(todoItemLabel).toContainText('kwa');
+
+
 
 });

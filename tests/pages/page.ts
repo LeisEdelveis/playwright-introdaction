@@ -1,25 +1,20 @@
 import {Locator} from "@playwright/test";
-import { Page } from '@playwright/test'
-import {lookup} from "node:dns";
+import {Page} from '@playwright/test'
 
 
-export class toDoPage{
-    readonly todoInput: Locator;
-    readonly page:Locator;
-    readonly toggle:Locator;
-    readonly clearCompleted:Locator;
-    readonly linkCompleted:Locator;
-    readonly todoLabel:Locator;
+export class ToDoPage {
+    readonly todoTextInput: Locator;
+    readonly todoItemToggle: Locator;
+    readonly activeLink: Locator;
+    readonly completedLink: Locator;
+    readonly todoItemLabel: Locator;
 
-
-
-    constructor(todoInput: Locator, page: Locator) {
-        this.todoInput = page.getByTestId('text-input');
-        this.page = page;
-        this.toggle = page.getByTestId('todo-item-toggle');
-        this.clearCompleted = page.getByRole('link', {name: 'active'});
-        this.linkCompleted = page.getByRole('link', {name: 'completed'})
-        this.todoLabel = page.getByTestId('todo-item-label');
+    constructor(page: Page) {
+        this.todoTextInput = page.getByTestId('text-input');
+        this.todoItemToggle = page.getByTestId('todo-item-toggle');
+        this.activeLink = page.getByRole('link', {name: 'active'});
+        this.completedLink = page.getByRole('link', {name: 'completed'})
+        this.todoItemLabel = page.getByTestId('todo-item-label');
 
     }
 }
